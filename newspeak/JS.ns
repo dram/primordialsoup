@@ -97,8 +97,14 @@ private pushExpat: closure = (
 	messageLoop handleMap at: expatIndex put:
 		[:status :pending |
 		| arguments = Array new: status. |
-		status to: 1 by: -1 do:
-			[:argumentIndex | arguments at: argumentIndex put: rawPop].
+		status timesRepeat: [
+			| index = rawPop. |
+			index > 0 ifTrue: [
+				arguments at: index put: rawPop
+			] ifFalse: [
+				arguments at: 0 - index put: (Alien withIndex: rawPop)
+			]
+		].
 		rawPush: (closure valueWithArguments: arguments)].
 	rawPushExpat: expatIndex.
 )

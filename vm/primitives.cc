@@ -3298,8 +3298,22 @@ EM_JS(void, _JS_pushAlien, (intptr_t index), {
 EM_JS(void, _JS_pushExpat, (intptr_t index), {
   var aliens = Module.aliens;
   function expat() {
-    for (var i = 0; i < arguments.length; i++) {
-      aliens.push(arguments[i]);
+    const alienIndices = [];
+    for (var i = 0; i < arguments.length; ++i) {
+      if (arguments[i] !== null && arguments[i] !== false && arguments[i] !== true
+          && typeof arguments[i] !== "number" && typeof arguments[i] !== "string") {
+        alienIndices[i] = aliens.length;
+        aliens.push(arguments[i]);
+      }
+    }
+    for (var i = 0; i < arguments.length; ++i) {
+      if (alienIndices[i] === undefined) {
+        aliens.push(arguments[i]);
+        aliens.push(i + 1);
+      } else {
+        aliens.push(alienIndices[i]);
+        aliens.push(- i - 1);
+      }
     }
     var timeout = Module._handle_signal(index, arguments.length, 0, 0);
     scheduleTurn(timeout);
